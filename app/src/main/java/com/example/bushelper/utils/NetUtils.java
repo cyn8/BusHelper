@@ -1,4 +1,4 @@
-package com.example.bushelper;
+package com.example.bushelper.utils;
 
 import java.io.BufferedReader;
 import java.io.IOException;

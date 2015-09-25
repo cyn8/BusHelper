@@ -1,4 +1,4 @@
-package com.example.bushelper;
+package com.example.bushelper.struct;
 
 /**
  * 位置信息 结构体

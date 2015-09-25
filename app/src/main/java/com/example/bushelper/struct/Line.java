@@ -1,4 +1,4 @@
-package com.example.bushelper;
+package com.example.bushelper.struct;
 
 /**
  * Created by chan on 15/9/23.

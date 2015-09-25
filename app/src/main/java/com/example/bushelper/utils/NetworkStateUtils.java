@@ -1,4 +1,4 @@
-package com.example.bushelper;
+package com.example.bushelper.utils;
 
 import android.content.Context;
 import android.net.ConnectivityManager;

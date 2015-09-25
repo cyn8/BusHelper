@@ -12,6 +12,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.example.bushelper.struct.Location;
+import com.example.bushelper.utils.NetUtils;
+import com.example.bushelper.utils.NetworkStateUtils;
 
 import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONException;
@@ -56,30 +61,14 @@ public class MainActivity extends Activity {
         layoutLine = (LinearLayout) findViewById(R.id.activity_main_layout_line);
         layoutTransfer = (LinearLayout) findViewById(R.id.activity_main_layout_transfer);
 
+        //默认初始化为线路查询模式
+        lineMode();
+
         //线路查询点击事件
         btnLine.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                btnTransfer.setBackgroundColor(Color.parseColor("#EEEEEE"));
-                btnTransfer.setTextColor(Color.parseColor("#000000"));
-                btnLine.setBackgroundColor(Color.parseColor("#3390D2"));
-                btnLine.setTextColor(Color.parseColor("#FFFFFF"));
-
-                layoutTransfer.setVisibility(View.GONE);
-                layoutLine.setVisibility(View.VISIBLE);
-
-                //查询按钮点击事件
-                btnSubmit.setOnClickListener(new View.OnClickListener() {
-
-                    @Override
-                    public void onClick(View v) {
-                        //传递城市名和线路名到LineActivity
-                        Intent intent = new Intent(MainActivity.this, LineActivity.class);
-                        intent.putExtra("cityName", etCityNameLine.getText().toString());
-                        intent.putExtra("lineName", etLineName.getText().toString());
-                        startActivity(intent);
-                    }
-                });
+                lineMode();
             }
         });
 
@@ -87,27 +76,7 @@ public class MainActivity extends Activity {
         btnTransfer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                btnLine.setBackgroundColor(Color.parseColor("#EEEEEE"));
-                btnLine.setTextColor(Color.parseColor("#000000"));
-                btnTransfer.setBackgroundColor(Color.parseColor("#3390D2"));
-                btnTransfer.setTextColor(Color.parseColor("#FFFFFF"));
-
-                layoutLine.setVisibility(View.GONE);
-                layoutTransfer.setVisibility(View.VISIBLE);
-
-                //查询按钮点击事件
-                btnSubmit.setOnClickListener(new View.OnClickListener() {
-
-                    @Override
-                    public void onClick(View v) {
-                        //传递城市名和线路名到LineActivity
-                        Intent intent = new Intent(MainActivity.this, LineActivity.class);
-                        intent.putExtra("cityName", etCityNameTransfer.getText().toString());
-                        intent.putExtra("init", etInit.getText().toString());
-                        intent.putExtra("dest", etDest.getText().toString());
-                        startActivity(intent);
-                    }
-                });
+                transferMode();
             }
         });
 
@@ -118,6 +87,70 @@ public class MainActivity extends Activity {
             //run GetLocationAsyncTask
             new GetLocationAsyncTask().execute(BAIDU_URL);
         }
+    }
+
+    /**
+     * 切换到线路查询模式
+     */
+    private void lineMode() {
+        btnTransfer.setBackgroundColor(Color.parseColor("#EEEEEE"));
+        btnTransfer.setTextColor(Color.parseColor("#000000"));
+        btnLine.setBackgroundColor(Color.parseColor("#3390D2"));
+        btnLine.setTextColor(Color.parseColor("#FFFFFF"));
+
+        layoutTransfer.setVisibility(View.GONE);
+        layoutLine.setVisibility(View.VISIBLE);
+
+        //查询按钮点击事件
+        btnSubmit.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                //输入合法性检查
+                if(etCityNameLine.getText().toString().equals("") || etLineName.getText().toString().equals("")) {
+                    Toast.makeText(MainActivity.this, "输入项不能为空", Toast.LENGTH_SHORT).show();
+                } else {
+                    //传递城市名和线路名到LineActivity
+                    Intent intent = new Intent(MainActivity.this, LineActivity.class);
+                    intent.putExtra("cityName", etCityNameLine.getText().toString());
+                    intent.putExtra("lineName", etLineName.getText().toString());
+                    startActivity(intent);
+                }
+
+            }
+        });
+    }
+
+    /**
+     * 切换到换乘查询模式
+     */
+    private void transferMode() {
+        btnLine.setBackgroundColor(Color.parseColor("#EEEEEE"));
+        btnLine.setTextColor(Color.parseColor("#000000"));
+        btnTransfer.setBackgroundColor(Color.parseColor("#3390D2"));
+        btnTransfer.setTextColor(Color.parseColor("#FFFFFF"));
+
+        layoutLine.setVisibility(View.GONE);
+        layoutTransfer.setVisibility(View.VISIBLE);
+
+        //查询按钮点击事件
+        btnSubmit.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                //输入合法性检查
+                if(etCityNameTransfer.getText().toString().equals("") || etInit.getText().toString().equals("") || etDest.getText().toString().equals("")) {
+                    Toast.makeText(MainActivity.this, "输入项不能为空", Toast.LENGTH_SHORT).show();
+                } else {
+                    //传递城市名和线路名到LineActivity
+                    Intent intent = new Intent(MainActivity.this, LineActivity.class);
+                    intent.putExtra("cityName", etCityNameTransfer.getText().toString());
+                    intent.putExtra("init", etInit.getText().toString());
+                    intent.putExtra("dest", etDest.getText().toString());
+                    startActivity(intent);
+                }
+            }
+        });
     }
 
     /**
@@ -169,7 +202,7 @@ public class MainActivity extends Activity {
             super.onPreExecute();
 
             //显示progressdialog
-            pd = ProgressDialog.show(MainActivity.this, "请稍等", "正在获取您的位置...", false);
+            pd = ProgressDialog.show(MainActivity.this, null, "正在获取您的位置...", false);
         }
 
         @Override
