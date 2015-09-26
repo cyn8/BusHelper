@@ -15,6 +15,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.bushelper.struct.Location;
+import com.example.bushelper.struct.Transfer;
 import com.example.bushelper.utils.NetUtils;
 import com.example.bushelper.utils.NetworkStateUtils;
 
@@ -143,7 +144,7 @@ public class MainActivity extends Activity {
                     Toast.makeText(MainActivity.this, "输入项不能为空", Toast.LENGTH_SHORT).show();
                 } else {
                     //传递城市名和线路名到LineActivity
-                    Intent intent = new Intent(MainActivity.this, LineActivity.class);
+                    Intent intent = new Intent(MainActivity.this, TransferActivity.class);
                     intent.putExtra("cityName", etCityNameTransfer.getText().toString());
                     intent.putExtra("init", etInit.getText().toString());
                     intent.putExtra("dest", etDest.getText().toString());

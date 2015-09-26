@@ -40,7 +40,7 @@ public class LineActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_line);
+        setContentView(R.layout.activity_line_transfer);
 
         //actionBar上添加返回按钮
         actionBar = getActionBar();
@@ -132,7 +132,7 @@ public class LineActivity extends Activity {
             params2.put("q", lineName);
             params2.put("app_key", AIBANG_APP_KEY);
             params2.put("alt", "json");
-            String jsonString = NetUtils.getRequest(AIBANG_LINE_URL, params2);
+            String jsonString = NetUtils.getRequest(params[0], params2);
 
             //返回数据解析
             return jsonString != null ? jsonToLineList(jsonString) : new ArrayList<Line>();

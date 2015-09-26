@@ -9,10 +9,11 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.widget.ExpandableListView;
+import android.widget.Toast;
 
-import com.example.bushelper.struct.Line;
 import com.example.bushelper.struct.Segment;
 import com.example.bushelper.struct.Transfer;
+import com.example.bushelper.utils.NetUtils;
 import com.example.bushelper.utils.NetworkStateUtils;
 
 import org.json.JSONArray;
@@ -44,6 +45,7 @@ public class TransferActivity extends Activity{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_line_transfer);
 
         //actionBar上添加返回按钮
         actionBar = getActionBar();
@@ -63,7 +65,7 @@ public class TransferActivity extends Activity{
 
         if(NetworkStateTag) {
             //run GetLocationAsyncTask
-            new LineAsyncTask().execute(AIBANG_LINE_URL);
+            new TransferAsyncTask().execute(AIBANG_TRANSFER_URL);
         }
     }
 
@@ -133,13 +135,62 @@ public class TransferActivity extends Activity{
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+
+            //显示progressdialog
+            pd = ProgressDialog.show(TransferActivity.this, null, "正在搜索...", false);
         }
 
         @Override
         protected List<Transfer> doInBackground(String... params) {
-            return null;
+            //封装请求参数，发送请求
+            Map<String, String> params2 = new HashMap<String, String>();
+            params2.put("city", cityName);
+            params2.put("app_key", AIBANG_APP_KEY);
+            params2.put("alt", "json");
+            params2.put("start_addr", init);
+            params2.put("end_addr", dest);
+            String jsonString = NetUtils.getRequest(params[0], params2);
+
+            //返回数据解析
+            return jsonString != null ? jsonToTransferList(jsonString) : new ArrayList<Transfer>();
         }
 
-        
+        @Override
+        protected void onPostExecute(List<Transfer> transfers) {
+            super.onPostExecute(transfers);
+
+            //没有找到结果，finish
+            if(transfers.size() == 0) {
+                Toast.makeText(TransferActivity.this, "没有找到线路", Toast.LENGTH_SHORT).show();
+                TransferActivity.this.finish();
+            } else {
+                //改变ActionBar的title
+                actionBar.setTitle("找到" + transfers.size() + "个方案");
+
+                //初始化数据
+                int count = 0;
+                for (Transfer transfer : transfers) {
+                    List<String> listTemp = new ArrayList<String>();
+
+                    String title = "<方案" + ++count + ">\t[全长]" + transfer.dist / 1000 + "km\t[换乘]" + transfer.segmentList.size() + "次\n[耗时]" + transfer.time + "min\t[步行]" + transfer.foot_dist + "m";
+                    parent.add(title);
+                    for (Segment segment:transfer.segmentList) {
+                        String detail = "";
+                        detail = "[搭乘] " + segment.lineName +
+                                "\n[起始站] " + segment.startStat + "\t\t\t\t[终点站] " + segment.endStat +
+                                "\n[经过站点]\n" + segment.stats +
+                                "\n[行驶距离] " + segment.lineDist / 1000 + "km\t\t\t\t[步行距离] " + segment.footDist + "m";
+                        listTemp.add(detail);
+                    }
+                    child.put(title, listTemp);
+                }
+
+                //加载数据到列表
+                elv.setAdapter(new MyExpandableListAdapter(TransferActivity.this, parent, child));
+            }
+
+            //dismiss pg
+            pd.dismiss();
+        }
     }
 }

@@ -23,6 +23,10 @@
             android:name=".LineActivity"
             android:label="@string/title_activity_line" >
         </activity>
+        <activity
+            android:name=".TransferActivity"
+            android:label="TransferActivity" >
+        </activity>
     </application>
 
 </manifest>
