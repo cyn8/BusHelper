@@ -46,7 +46,6 @@ public class LineActivity extends Activity {
         actionBar = getActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
 
-
         //实例化控件
         elv = (ExpandableListView) findViewById(R.id.activity_line_elv);
 
